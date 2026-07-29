@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quizverse_web
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=production-super-secret-key-quizverse-2026
+      - DATABASE_URL=sqlite:////app/instance/quiz.db
+    volumes:
+      - quizverse_data:/app/instance
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  quizverse_data:
+    driver: local

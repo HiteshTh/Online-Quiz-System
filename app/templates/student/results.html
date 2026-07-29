@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Exam Results - {{ attempt.quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-sm btn-secondary-custom mb-2">
+                <i class="bi bi-arrow-left"></i> Portal Home
+            </a>
+            <h1 class="mb-1 text-white font-heading">Performance Report</h1>
+            <p class="text-secondary mb-0">Grade details, response analysis, and credentials download</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('student.leaderboard', quiz_id=attempt.quiz.id) }}" class="btn btn-secondary-custom">
+                <i class="bi bi-trophy-fill me-2" style="color: var(--accent-teal);"></i>View Leaderboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Results Score summary card -->
+    <div class="col-lg-4">
+        <div class="card glass-card p-4 text-center sticky-top" style="top: 100px;">
+            <h5 class="text-secondary text-uppercase mb-3">Overall Result</h5>
+            
+            <div class="my-4">
+                {% if attempt.is_passed %}
+                    <i class="bi bi-patch-check-fill text-success display-1 mb-3 d-block"></i>
+                    <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-35 badge-custom px-4 py-2 fs-6">PASSED</span>
+                {% else %}
+                    <i class="bi bi-patch-exclamation-fill text-danger display-1 mb-3 d-block"></i>
+                    <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-35 badge-custom px-4 py-2 fs-6">FAILED</span>
+                {% endif %}
+            </div>
+            
+            <h2 class="display-5 font-heading text-white mb-1">{{ attempt.score }} / {{ attempt.total_marks }}</h2>
+            <p class="text-secondary">Marks Earned ({{ attempt.percentage }}%)</p>
+            
+            <hr class="border-secondary border-opacity-25 my-4">
+            
+            <div class="text-start mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-secondary small">Required Pass score:</span>
+                    <strong class="text-white small">{{ attempt.quiz.pass_percentage }}%</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-secondary small">Tab switch violations:</span>
+                    <strong class="{% if attempt.tab_switch_count > 0 %}text-warning{% else %}text-white{% endif %} small">
+                        {{ attempt.tab_switch_count }} switch(es)
+                    </strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-secondary small">Submission Status:</span>
+                    <strong class="text-white small">{{ attempt.status|replace('_', ' ')|capitalize }}</strong>
+                </div>
+            </div>
+            
+            {% if attempt.is_passed %}
+                <div class="d-flex flex-column gap-2">
+                    <!-- Link to download certificate PDF -->
+                    <a href="{{ url_for('student.download_certificate', attempt_id=attempt.id) }}" class="btn btn-teal-custom w-100 py-2">
+                        <i class="bi bi-file-pdf-fill me-2"></i>Download PDF Certificate
+                    </a>
+                    <!-- Button to trigger emailing certificate -->
+                    <form method="POST" action="{{ url_for('student.email_certificate', attempt_id=attempt.id) }}">
+                        <button type="submit" class="btn btn-secondary-custom w-100 py-2">
+                            <i class="bi bi-envelope-fill me-2"></i>Email Certificate
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="alert bg-danger bg-opacity-10 border border-danger border-opacity-20 text-danger small mb-0">
+                    <i class="bi bi-info-circle me-1"></i> You did not reach the passing percentage of {{ attempt.quiz.pass_percentage }}% to qualify for a certificate. Better luck next time!
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Question Response Analysis -->
+    <div class="col-lg-8">
+        <div class="card glass-card p-4">
+            <h4 class="mb-4 text-white font-heading"><i class="bi bi-journal-text me-2" style="color: var(--accent-purple);"></i>Response Breakdown</h4>
+            
+            <div class="d-flex flex-column gap-4">
+                {% for ans in attempt.answers %}
+                    <div class="p-4 bg-black bg-opacity-20 border {% if ans.is_correct %}border-success{% else %}border-danger{% endif %} border-opacity-25 rounded-3">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="text-white font-heading">
+                                <span class="text-secondary me-2">Q{{ loop.index }}.</span>
+                                {{ ans.question.question_text }}
+                            </h5>
+                            {% if ans.is_correct %}
+                                <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-35 badge-custom">Correct</span>
+                            {% else %}
+                                <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-35 badge-custom">Incorrect</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Response detail -->
+                        <div class="small">
+                            {% if ans.question.question_type in ['mcq', 'true_false'] %}
+                                <div class="mb-2">
+                                    <span class="text-secondary">Your Selection:</span>
+                                    <strong class="{% if ans.is_correct %}text-success{% else %}text-danger{% endif %}">
+                                        {{ ans.selected_option.option_text if ans.selected_option else 'None (Skipped)' }}
+                                    </strong>
+                                </div>
+                                {% if not ans.is_correct %}
+                                    <div>
+                                        <span class="text-secondary">Correct Option:</span>
+                                        <strong class="text-success">
+                                            {% for opt in ans.question.options %}
+                                                {% if opt.is_correct %}{{ opt.option_text }}{% endif %}
+                                            {% endfor %}
+                                        </strong>
+                                    </div>
+                                {% endif %}
+                            {% elif ans.question.question_type == 'fill_blank' %}
+                                <div class="mb-2">
+                                    <span class="text-secondary">Your Answer:</span>
+                                    <strong class="{% if ans.is_correct %}text-success{% else %}text-danger{% endif %}">
+                                        {{ ans.text_answer if ans.text_answer else 'None (Skipped)' }}
+                                    </strong>
+                                </div>
+                                {% if not ans.is_correct %}
+                                    <div>
+                                        <span class="text-secondary">Correct Answer:</span>
+                                        <strong class="text-success">
+                                            {% for opt in ans.question.options %}
+                                                {% if opt.is_correct %}{{ opt.option_text }}{% endif %}
+                                            {% endfor %}
+                                        </strong>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

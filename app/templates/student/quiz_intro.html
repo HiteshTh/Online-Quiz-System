@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Instructions - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+        <div class="card glass-card p-4 p-md-5">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('student.dashboard') }}" class="btn btn-sm btn-secondary-custom me-3">
+                    <i class="bi bi-arrow-left"></i> Exit
+                </a>
+                <h2 class="mb-0 text-white font-heading">Attempt Registration</h2>
+            </div>
+
+            <div class="p-4 bg-black bg-opacity-20 border border-secondary border-opacity-15 rounded-3 mb-4">
+                <h3 class="text-teal font-heading mb-3" style="color: var(--accent-teal);">{{ quiz.title }}</h3>
+                <p class="text-secondary">{{ quiz.description or "No special instructions provided by the examiner." }}</p>
+            </div>
+
+            <!-- Quiz parameters grid -->
+            <div class="row g-3 mb-5">
+                <div class="col-6 col-sm-4 col-md-3">
+                    <div class="border border-secondary border-opacity-20 p-3 rounded text-center">
+                        <small class="text-secondary d-block uppercase mb-1">Duration</small>
+                        <strong class="text-white">{{ quiz.duration_minutes }} mins</strong>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3">
+                    <div class="border border-secondary border-opacity-20 p-3 rounded text-center">
+                        <small class="text-secondary d-block uppercase mb-1">Questions</small>
+                        <strong class="text-white">{{ quiz.questions|length }} items</strong>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3">
+                    <div class="border border-secondary border-opacity-20 p-3 rounded text-center">
+                        <small class="text-secondary d-block uppercase mb-1">Pass Mark</small>
+                        <strong class="text-white">{{ quiz.pass_percentage }}%</strong>
+                    </div>
+                </div>
+                <div class="col-6 col-sm-4 col-md-3">
+                    <div class="border border-secondary border-opacity-20 p-3 rounded text-center">
+                        <small class="text-secondary d-block uppercase mb-1">Negative Mark</small>
+                        <strong class="{% if quiz.negative_marking %}text-danger{% else %}text-secondary{% endif %}">
+                            {% if quiz.negative_marking %}-{{ quiz.negative_mark_value }} pts{% else %}Disabled{% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pro Anti Cheating Alerts -->
+            <div class="alert alert-custom p-4 mb-5 border-warning border-opacity-40" style="background: rgba(245, 158, 11, 0.06);">
+                <div class="d-flex align-items-start mb-3">
+                    <i class="bi bi-shield-lock-fill text-warning fs-2 me-3"></i>
+                    <div>
+                        <h5 class="text-warning font-heading fw-bold mb-1">Proctoring & Safe Exam Policy Activated</h5>
+                        <p class="text-secondary mb-0 small">
+                            QuizVerse Safe Exam Guard enforces strict real-time telemetry throughout this examination.
+                        </p>
+                    </div>
+                </div>
+                <div class="row g-2 pt-2 border-top border-warning border-opacity-20 text-secondary small">
+                    <div class="col-sm-6"><i class="bi bi-arrows-fullscreen text-teal-custom me-2"></i><strong>Mandatory Fullscreen:</strong> Exam requires full screen. Exiting full screen logs a violation.</div>
+                    <div class="col-sm-6"><i class="bi bi-window-x text-danger me-2"></i><strong>Tab-Switch Guard:</strong> Tab switching or window blur triggers security popup warnings.</div>
+                    <div class="col-sm-6"><i class="bi bi-clipboard-x text-info me-2"></i><strong>Clipboard Locked:</strong> Copying text and right-click context menus are disabled.</div>
+                    <div class="col-sm-6"><i class="bi bi-code-slash text-warning me-2"></i><strong>DevTools Guard:</strong> Inspection shortcuts (F12, Ctrl+Shift+I/J/C) are blocked.</div>
+                </div>
+                <div class="mt-3 pt-2 text-danger small font-monospace fw-semibold">
+                    <i class="bi bi-exclamation-octagon-fill me-1"></i> Reaching 3 total violations will automatically submit your exam immediately.
+                </div>
+            </div>
+
+            <!-- Trigger form -->
+            <form method="POST" action="{{ url_for('student.start_attempt', quiz_id=quiz.id) }}">
+                {% if active_attempt %}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-teal-custom py-2">
+                            <i class="bi bi-play-circle-fill me-2"></i>Resume In-Progress Attempt
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary-custom py-2" onclick="return confirm('Do you wish to start the timer now? You cannot pause the timer once started.');">
+                            <i class="bi bi-rocket-takeoff-fill me-2"></i>Agree & Start Examination
+                        </button>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

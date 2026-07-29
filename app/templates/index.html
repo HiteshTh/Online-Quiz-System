@@ -1,0 +1,765 @@
+{% extends 'base.html' %}
+
+{% block title %}QuizVerse — Interactive Learning & Online Assessment Platform{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+{% endblock %}
+
+{% block main %}
+<!-- ── HERO SECTION (iGuru Style) ────────────────────────────────────── -->
+<section class="hero-wrapper" id="home">
+    <div class="hero-grid-bg"></div>
+    <div class="hero-glow-1"></div>
+    <div class="hero-glow-2"></div>
+    
+    <div class="container hero-content">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-6 text-start" data-reveal="fade-left">
+                <div class="hero-badge">
+                    <i class="bi bi-patch-check-fill text-info animate-pulse"></i> 
+                    <span>#1 Rated Online Assessment & Quiz System v2.1</span>
+                </div>
+                <h1 class="hero-title">
+                    Master Skills With <span class="highlight">Interactive Quizzes</span> & Instant Certification.
+                </h1>
+                <p class="hero-subtitle">
+                    Step into next-generation skill evaluation. QuizVerse combines real-time sandboxed code execution, anti-cheat telemetry, live leaderboards, and auto-generated PDF certificates.
+                </p>
+                
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-teal-custom px-4.5 py-3 d-flex align-items-center gap-2 shadow-lg hover-lift" style="font-weight: 700;">
+                        <i class="bi bi-rocket-takeoff-fill"></i> Get Started Free
+                    </a>
+                    <a href="#quizzes" class="btn btn-secondary-custom px-4 py-3 d-flex align-items-center gap-2 hover-lift" style="font-weight: 600;">
+                        <i class="bi bi-journal-bookmark-fill text-teal-custom"></i> Explore Quizzes
+                    </a>
+                </div>
+
+                <!-- Social Proof / Avatars Stack -->
+                <div class="d-flex align-items-center gap-3 pt-2">
+                    <div class="avatars-stack">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Student">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt="Student">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" alt="Student">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" alt="Student">
+                    </div>
+                    <div>
+                        <div class="star-rating mb-0" style="font-size: 0.82rem;">
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <i class="bi bi-star-fill"></i>
+                            <span class="text-white ms-1 fw-bold">4.9/5</span>
+                        </div>
+                        <span class="small text-secondary">Joined by 15,000+ students worldwide</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 position-relative" data-reveal="fade-right" data-delay="150">
+                <!-- Floating Hero Badge Chip Top Right -->
+                <div class="floating-chip chip-top-right animate-float d-none d-sm-flex">
+                    <div class="brand-icon-box" style="width: 38px; height: 38px; font-size: 1rem;">
+                        <i class="bi bi-shield-check text-info"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">Anti-Cheat Guard</div>
+                        <div class="text-secondary opacity-75" style="font-size: 0.75rem;">Strict Tab &amp; Focus Telemetry</div>
+                    </div>
+                </div>
+
+                <!-- Floating Hero Badge Chip Bottom Left -->
+                <div class="floating-chip chip-bottom-left animate-float d-none d-sm-flex" style="animation-delay: 2s;">
+                    <div class="brand-icon-box" style="width: 38px; height: 38px; font-size: 1rem; background: linear-gradient(135deg, #10b981 0%, #05d5ff 100%);">
+                        <i class="bi bi-file-earmark-pdf-fill text-white"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">Instant PDF Certificates</div>
+                        <div class="text-secondary opacity-75" style="font-size: 0.75rem;">Verified Passing Credentials</div>
+                    </div>
+                </div>
+
+                <!-- Project-Specific Online Examination Visual Hero Card -->
+                <div class="hero-image-card p-3 rounded-4" style="background: rgba(31, 29, 71, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 25px 60px rgba(0,0,0,0.5);">
+                    <div class="position-relative rounded-4 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" alt="Online Examination Platform" class="img-fluid w-100 rounded-4" style="height: 360px; object-fit: cover;">
+                        <div class="position-absolute inset-0" style="background: linear-gradient(180deg, rgba(12, 9, 42, 0.2) 0%, rgba(12, 9, 42, 0.9) 100%);"></div>
+                        
+                        <!-- Overlay Quiz Assessment Live UI Badge -->
+                        <div class="position-absolute bottom-0 start-0 end-0 p-3.5 m-3 rounded-3" style="background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.15);">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 px-2.5 py-1 font-monospace">
+                                        <i class="bi bi-check-circle-fill me-1"></i> 96% PASSED
+                                    </span>
+                                    <span class="badge bg-primary bg-opacity-30 text-white border border-primary border-opacity-30 px-2.5 py-1">Python Certification</span>
+                                </div>
+                                <span class="text-teal-custom small font-monospace"><i class="bi bi-clock-history me-1"></i> Completed in 18m</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between text-white small">
+                                <span><i class="bi bi-person-fill text-secondary me-1"></i> Candidate: Alex Rivera</span>
+                                <span class="text-warning font-monospace"><i class="bi bi-award-fill me-1"></i> Certificate Issued</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── iGuru STAT COUNTER STRIP ────────────────────────────────────── -->
+<div class="container stats-strip-wrapper">
+    <div class="row g-4">
+        <div class="col-6 col-lg-3" data-reveal="zoom-up" data-delay="0">
+            <div class="stat-card-iguru">
+                <div class="stat-icon-wrapper" style="background: rgba(106, 90, 224, 0.15); color: #818cf8;">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ "{:,}".format(stats.students|default(14850)) }}+</div>
+                    <div class="stat-label">Active Learners</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3" data-reveal="zoom-up" data-delay="150">
+            <div class="stat-card-iguru">
+                <div class="stat-icon-wrapper" style="background: rgba(5, 213, 255, 0.15); color: #38bdf8;">
+                    <i class="bi bi-journal-check"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ "{:,}".format(stats.quizzes|default(1250)) }}+</div>
+                    <div class="stat-label">Verified Quizzes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3" data-reveal="zoom-up" data-delay="300">
+            <div class="stat-card-iguru">
+                <div class="stat-icon-wrapper" style="background: rgba(34, 197, 94, 0.15); color: #4ade80;">
+                    <i class="bi bi-patch-check-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ stats.pass_rate|default(98.4) }}%</div>
+                    <div class="stat-label">Certification Pass Rate</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3" data-reveal="zoom-up" data-delay="450">
+            <div class="stat-card-iguru">
+                <div class="stat-icon-wrapper" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+                    <i class="bi bi-award-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ "{:,}".format(stats.attempts|default(48200)) }}+</div>
+                    <div class="stat-label">Exams Completed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── POPULAR QUIZ CATEGORIES (iGuru Style) ───────────────────────── -->
+<section class="py-5" id="categories">
+    <div class="container">
+        <div class="text-center mb-5" data-reveal="fade-up">
+            <span class="section-tag"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Top Subject Domains</span>
+            <h2 class="section-title">Explore Popular Categories</h2>
+            <p class="section-subtitle">Choose from diverse technical and academic domains crafted by verified educators and industry experts.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="0">
+                <a href="{{ url_for('auth.register') }}" class="category-card-iguru">
+                    <div class="cat-icon-bubble" style="background: var(--cat-gradient-mint);">
+                        <i class="bi bi-code-slash"></i>
+                    </div>
+                    <h3 class="cat-title">Web & Software Engineering</h3>
+                    <p class="cat-count">340+ Quizzes & Exercises</p>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="150">
+                <a href="{{ url_for('auth.register') }}" class="category-card-iguru">
+                    <div class="cat-icon-bubble" style="background: var(--cat-gradient-coral);">
+                        <i class="bi bi-cpu-fill"></i>
+                    </div>
+                    <h3 class="cat-title">Data Science & AI / ML</h3>
+                    <p class="cat-count">215+ Quizzes & Exercises</p>
+                </a>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="300">
+                <a href="{{ url_for('auth.register') }}" class="category-card-iguru">
+                    <div class="cat-icon-bubble" style="background: var(--cat-gradient-purple);">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h3 class="cat-title">Cybersecurity & Networking</h3>
+                    <p class="cat-count">180+ Quizzes & Exercises</p>
+                </a>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="100">
+                <a href="{{ url_for('auth.register') }}" class="category-card-iguru">
+                    <div class="cat-icon-bubble" style="background: var(--cat-gradient-lavender);">
+                        <i class="bi bi-calculator-fill"></i>
+                    </div>
+                    <h3 class="cat-title">Aptitude & Mathematics</h3>
+                    <p class="cat-count">290+ Quizzes & Exercises</p>
+                </a>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="250">
+                <a href="{{ url_for('auth.register') }}" class="category-card-iguru">
+                    <div class="cat-icon-bubble" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);">
+                        <i class="bi bi-diagram-3-fill"></i>
+                    </div>
+                    <h3 class="cat-title">DevOps & Cloud Computing</h3>
+                    <p class="cat-count">150+ Quizzes & Exercises</p>
+                </a>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="400">
+                <a href="{{ url_for('auth.register') }}" class="category-card-iguru">
+                    <div class="cat-icon-bubble" style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);">
+                        <i class="bi bi-briefcase-fill"></i>
+                    </div>
+                    <h3 class="cat-title">Business & Management</h3>
+                    <p class="cat-count">125+ Quizzes & Exercises</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FEATURED QUIZZES SHOWCASE (iGuru Course Cards) ───────────────── -->
+<section class="py-5 bg-gradient-dark" id="quizzes">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between mb-5" data-reveal="fade-up">
+            <div>
+                <span class="section-tag"><i class="bi bi-journal-bookmark-fill me-1"></i> Trending Examinations</span>
+                <h2 class="section-title mb-0">Featured Quizzes & Exams</h2>
+            </div>
+            <a href="{{ url_for('auth.register') }}" class="btn btn-secondary-custom px-4 py-2 mt-3 mt-md-0 d-inline-flex align-items-center gap-2">
+                View All Quizzes <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <!-- Course Card 1 -->
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="0">
+                <div class="quiz-card-iguru">
+                    <div class="quiz-card-header" style="background-image: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80');">
+                        <div class="quiz-card-overlay"></div>
+                        <div class="quiz-header-content d-flex justify-content-between">
+                            <span class="badge bg-primary bg-opacity-75 backdrop-blur px-3 py-1.5 rounded-pill">Python Core</span>
+                            <span class="badge bg-warning text-dark font-monospace fw-bold px-2.5 py-1 rounded-pill">Intermediate</span>
+                        </div>
+                    </div>
+                    <div class="quiz-card-body">
+                        <h3 class="quiz-title">Python Developer Certification Assessment</h3>
+                        <p class="quiz-desc">Test your knowledge of OOP, data structures, list comprehensions, and Pythonic best practices.</p>
+                        
+                        <div class="quiz-meta-row">
+                            <span><i class="bi bi-clock me-1 text-teal-custom"></i> 30 Mins</span>
+                            <span><i class="bi bi-question-circle me-1 text-info"></i> 25 Questions</span>
+                            <span><i class="bi bi-trophy me-1 text-warning"></i> 70% Pass</span>
+                        </div>
+
+                        <div class="quiz-footer-row">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80" width="30" height="30" class="rounded-circle" alt="Instructor">
+                                <span class="small text-secondary">Dr. Sarah Vance</span>
+                            </div>
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-teal-custom btn-sm px-3 py-1.5 rounded-3">Take Quiz</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Card 2 -->
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="200">
+                <div class="quiz-card-iguru">
+                    <div class="quiz-card-header" style="background-image: url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80');">
+                        <div class="quiz-card-overlay"></div>
+                        <div class="quiz-header-content d-flex justify-content-between">
+                            <span class="badge bg-info bg-opacity-75 backdrop-blur px-3 py-1.5 rounded-pill">Full-Stack</span>
+                            <span class="badge bg-danger text-white font-monospace fw-bold px-2.5 py-1 rounded-pill">Advanced</span>
+                        </div>
+                    </div>
+                    <div class="quiz-card-body">
+                        <h3 class="quiz-title">Full-Stack Web Dev Master Examination</h3>
+                        <p class="quiz-desc">Comprehensive test covering modern HTML5, CSS Grid, ES6 JS, REST APIs, and authentication.</p>
+                        
+                        <div class="quiz-meta-row">
+                            <span><i class="bi bi-clock me-1 text-teal-custom"></i> 45 Mins</span>
+                            <span><i class="bi bi-question-circle me-1 text-info"></i> 35 Questions</span>
+                            <span><i class="bi bi-trophy me-1 text-warning"></i> 75% Pass</span>
+                        </div>
+
+                        <div class="quiz-footer-row">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80" width="30" height="30" class="rounded-circle" alt="Instructor">
+                                <span class="small text-secondary">Prof. Alex Rivera</span>
+                            </div>
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-teal-custom btn-sm px-3 py-1.5 rounded-3">Take Quiz</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Card 3 -->
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="400">
+                <div class="quiz-card-iguru">
+                    <div class="quiz-card-header" style="background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80');">
+                        <div class="quiz-card-overlay"></div>
+                        <div class="quiz-header-content d-flex justify-content-between">
+                            <span class="badge bg-success bg-opacity-75 backdrop-blur px-3 py-1.5 rounded-pill">Algorithms</span>
+                            <span class="badge bg-success text-white font-monospace fw-bold px-2.5 py-1 rounded-pill">Beginner</span>
+                        </div>
+                    </div>
+                    <div class="quiz-card-body">
+                        <h3 class="quiz-title">Data Structures & Big-O Challenge</h3>
+                        <p class="quiz-desc">Evaluate binary trees, hash tables, sorting algorithms, and space-time complexity analysis.</p>
+                        
+                        <div class="quiz-meta-row">
+                            <span><i class="bi bi-clock me-1 text-teal-custom"></i> 25 Mins</span>
+                            <span><i class="bi bi-question-circle me-1 text-info"></i> 20 Questions</span>
+                            <span><i class="bi bi-trophy me-1 text-warning"></i> 65% Pass</span>
+                        </div>
+
+                        <div class="quiz-footer-row">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=80&q=80" width="30" height="30" class="rounded-circle" alt="Instructor">
+                                <span class="small text-secondary">Elena Rostova</span>
+                            </div>
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-teal-custom btn-sm px-3 py-1.5 rounded-3">Take Quiz</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── KEY FEATURES / WHY CHOOSE US (iGuru Feature Highlights) ────────── -->
+<section class="py-5" id="features">
+    <div class="container">
+        <div class="text-center mb-5" data-reveal="fade-up">
+            <span class="section-tag"><i class="bi bi-cpu-fill me-1"></i> Enterprise Grade Engine</span>
+            <h2 class="section-title">Built for Modern Educational Excellence</h2>
+            <p class="section-subtitle">Designed to empower both institutions and learners with robust anti-cheating, real-time sync, and automated credentials.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3" data-reveal="flip-up" data-delay="0">
+                <div class="feature-card-iguru">
+                    <div class="feature-icon-box">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h3 class="fw-bold h5 text-white mb-2">Anti-Cheat Guard</h3>
+                    <p class="text-secondary small mb-0">Tab-switch tracking, window focus telemetry, and automatic test submission upon repeated violations.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-reveal="flip-up" data-delay="150">
+                <div class="feature-card-iguru">
+                    <div class="feature-icon-box" style="background: rgba(5, 213, 255, 0.15); border-color: rgba(5, 213, 255, 0.3);">
+                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                    </div>
+                    <h3 class="fw-bold h5 text-white mb-2">Instant PDF Certificates</h3>
+                    <p class="text-secondary small mb-0">High-resolution landscape PDF certificates generated automatically using ReportLab upon achieving passing scores.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-reveal="flip-up" data-delay="300">
+                <div class="feature-card-iguru">
+                    <div class="feature-icon-box" style="background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.3); color: #4ade80;">
+                        <i class="bi bi-bar-chart-line-fill"></i>
+                    </div>
+                    <h3 class="fw-bold h5 text-white mb-2">Live SocketIO Leaderboard</h3>
+                    <p class="text-secondary small mb-0">Real-time examination room peer counters and immediate live ranking updates upon test completion.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-reveal="flip-up" data-delay="450">
+                <div class="feature-card-iguru">
+                    <div class="feature-icon-box" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.3); color: #fbbf24;">
+                        <i class="bi bi-file-earmark-excel-fill"></i>
+                    </div>
+                    <h3 class="fw-bold h5 text-white mb-2">CSV Bulk Question Import</h3>
+                    <p class="text-secondary small mb-0">Examiners can construct question pools in seconds by uploading standard CSV files with custom scoring.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── HOW IT WORKS (Step-by-step Process) ───────────────────────────── -->
+<section class="py-5 bg-gradient-dark" id="how-it-works">
+    <div class="container">
+        <div class="text-center mb-5" data-reveal="fade-up">
+            <span class="section-tag"><i class="bi bi-diagram-3-fill me-1"></i> Simple Workflow</span>
+            <h2 class="section-title">How QuizVerse Works</h2>
+            <p class="section-subtitle">Four seamless steps to test your skills and earn recognized achievements.</p>
+        </div>
+
+        <div class="row g-4 position-relative">
+            <div class="col-md-6 col-lg-3" data-reveal="fade-right" data-delay="0">
+                <div class="step-card-iguru">
+                    <div class="step-number-bubble">01</div>
+                    <h4 class="h5 fw-bold text-white mb-2">Choose Examination</h4>
+                    <p class="text-secondary small mb-0">Select from hundreds of curated quizzes spanning web development, data science, and core academics.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-reveal="fade-right" data-delay="150">
+                <div class="step-card-iguru">
+                    <div class="step-number-bubble" style="background: linear-gradient(135deg, #05d5ff 0%, #3b82f6 100%);">02</div>
+                    <h4 class="h5 fw-bold text-white mb-2">Take Safe Exam</h4>
+                    <p class="text-secondary small mb-0">Attempt timed questions under anti-cheat protection with randomized option order.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-reveal="fade-right" data-delay="300">
+                <div class="step-card-iguru">
+                    <div class="step-number-bubble" style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);">03</div>
+                    <h4 class="h5 fw-bold text-white mb-2">Get Real-Time Grade</h4>
+                    <p class="text-secondary small mb-0">Instant detailed breakdown of your score, correct answers, time taken, and leaderboard rank.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3" data-reveal="fade-right" data-delay="450">
+                <div class="step-card-iguru">
+                    <div class="step-number-bubble" style="background: linear-gradient(135deg, #10b981 0%, #05d5ff 100%);">04</div>
+                    <h4 class="h5 fw-bold text-white mb-2">Claim PDF Certificate</h4>
+                    <p class="text-secondary small mb-0">Download your official, verified certificate of completion formatted for portfolio presentation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── TESTIMONIALS & REVIEWS ────────────────────────────────────────── -->
+<section class="py-5" id="testimonials">
+    <div class="container">
+        <div class="text-center mb-5" data-reveal="fade-up">
+            <span class="section-tag"><i class="bi bi-chat-quote-fill me-1"></i> Wall of Love</span>
+            <h2 class="section-title">What Our Learners & Educators Say</h2>
+            <p class="section-subtitle">Feedback from students and teachers who rely on QuizVerse for assessments.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" data-reveal="zoom-in" data-delay="0">
+                <div class="testimonial-card-iguru">
+                    <div>
+                        <div class="star-rating">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="testimonial-quote">"The anti-cheating tab enforcement gave our university department complete confidence when running remote examinations."</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" width="44" height="44" class="rounded-circle" alt="User">
+                        <div>
+                            <div class="fw-bold text-white small">Prof. David Miller</div>
+                            <div class="text-secondary" style="font-size: 0.8rem;">Head of CS, Tech Institute</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-reveal="zoom-in" data-delay="200">
+                <div class="testimonial-card-iguru">
+                    <div>
+                        <div class="star-rating">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="testimonial-quote">"I passed the Python Core exam and received a beautiful PDF certificate instantly. It made my LinkedIn profile stand out!"</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" width="44" height="44" class="rounded-circle" alt="User">
+                        <div>
+                            <div class="fw-bold text-white small">Marcus Chen</div>
+                            <div class="text-secondary" style="font-size: 0.8rem;">Software Engineer Candidate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4" data-reveal="zoom-in" data-delay="400">
+                <div class="testimonial-card-iguru">
+                    <div>
+                        <div class="star-rating">
+                            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        </div>
+                        <p class="testimonial-quote">"Importing 100+ questions via CSV took less than 30 seconds. The SocketIO live leaderboard during exam time was super engaging."</p>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" width="44" height="44" class="rounded-circle" alt="User">
+                        <div>
+                            <div class="fw-bold text-white small">Samantha Wright</div>
+                            <div class="text-secondary" style="font-size: 0.8rem;">Lead STEM Instructor</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── PRICING & MEMBERSHIP (iGuru Style) ──────────────────────────── -->
+<section class="py-5 bg-gradient-dark" id="pricing">
+    <div class="container">
+        <div class="text-center mb-5" data-reveal="fade-up">
+            <span class="section-tag"><i class="bi bi-award-fill me-1"></i> Flexible Options</span>
+            <h2 class="section-title">Transparent Membership Plans</h2>
+            <p class="section-subtitle">Start for free or upgrade to unlock unlimited examinations and advanced proctoring tools.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- Free Plan -->
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="0">
+                <div class="pricing-card-iguru">
+                    <h3 class="fw-bold text-white h4 mb-1">Student Free</h3>
+                    <p class="text-secondary small mb-3">Ideal for casual learners</p>
+                    <div class="price-tag">$0 <span class="price-period">/ forever</span></div>
+                    <hr class="border-secondary opacity-25 my-4">
+                    <ul class="list-unstyled text-secondary small mb-4">
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> Access to 50+ Public Quizzes</li>
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> Timed Exam Engine</li>
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> Instant Pass/Fail Results</li>
+                        <li class="mb-2.5 opacity-50"><i class="bi bi-x-lg me-2"></i> Custom PDF Certificates</li>
+                        <li class="opacity-50"><i class="bi bi-x-lg me-2"></i> Examiner Quiz Builder</li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-secondary-custom w-100 py-2.5 fw-semibold">Sign Up Free</a>
+                </div>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="200">
+                <div class="pricing-card-iguru popular-plan">
+                    <div class="popular-badge">Most Popular</div>
+                    <h3 class="fw-bold text-white h4 mb-1">Pro Learner</h3>
+                    <p class="text-secondary small mb-3">For serious job seekers & students</p>
+                    <div class="price-tag">$12 <span class="price-period">/ month</span></div>
+                    <hr class="border-secondary opacity-25 my-4">
+                    <ul class="list-unstyled text-secondary small mb-4">
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> Unlimited Quiz Access</li>
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> High-Res Verified PDF Certificates</li>
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> Real-time Leaderboard Rankings</li>
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> Detailed Performance Analytics</li>
+                        <li class="opacity-50"><i class="bi bi-x-lg me-2"></i> CSV Quiz Import</li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-teal-custom w-100 py-2.5 fw-bold shadow">Upgrade to Pro</a>
+                </div>
+            </div>
+
+            <!-- Institution Plan -->
+            <div class="col-md-6 col-lg-4" data-reveal="fade-up" data-delay="400">
+                <div class="pricing-card-iguru">
+                    <h3 class="fw-bold text-white h4 mb-1">Examiner & School</h3>
+                    <p class="text-secondary small mb-3">For teachers, schools & recruiters</p>
+                    <div class="price-tag">$49 <span class="price-period">/ month</span></div>
+                    <hr class="border-secondary opacity-25 my-4">
+                    <ul class="list-unstyled text-secondary small mb-4">
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> Create & Publish Custom Quizzes</li>
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> Bulk CSV Question Import</li>
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> AI Anti-Cheat Telemetry Monitoring</li>
+                        <li class="mb-2.5"><i class="bi bi-check-lg text-teal-custom me-2"></i> Custom Negative Marking Schemes</li>
+                        <li><i class="bi bi-check-lg text-teal-custom me-2"></i> Dedicated Examiner Dashboard</li>
+                    </ul>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-secondary-custom w-100 py-2.5 fw-semibold">Start Examiner Trial</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── FAQ ACCORDION SECTION ────────────────────────────────────────── -->
+<section class="py-5" id="faq">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <span class="section-tag"><i class="bi bi-question-circle-fill me-1"></i> Support Hub</span>
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <p class="section-subtitle">Got questions? We have answers regarding quizzes, anti-cheating, and certificates.</p>
+                </div>
+
+                <div class="accordion accordion-iguru" id="landingFaqAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                How does the Anti-Cheating Guard protect exams?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#landingFaqAccordion">
+                            <div class="accordion-body">
+                                QuizVerse automatically monitors window focus and tab switches during timed assessments. Students receive visual warnings upon leaving the exam tab, and on the 3rd violation, the engine automatically locks and submits the attempt.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                How do PDF Certificates work?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#landingFaqAccordion">
+                            <div class="accordion-body">
+                                When a student achieves the required passing score (e.g. 70%), QuizVerse utilizes ReportLab on the server to dynamically generate a personalized landscape PDF certificate complete with student name, quiz title, score, and issue date.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                How can Teachers & Examiners import CSV questions?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#landingFaqAccordion">
+                            <div class="accordion-body">
+                                In the Admin/Examiner Dashboard, teachers can upload standard `.csv` files containing columns for Question Text, Option A, Option B, Option C, Option D, and Correct Answer. The platform auto-creates the questions instantly.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── CTA BANNER ────────────────────────────────────────────────── -->
+<div class="container my-5">
+    <div class="cta-banner-iguru text-center text-white" data-reveal="zoom-up">
+        <h2 class="fw-bold display-5 mb-3">Ready to Elevate Your Skill Assessment?</h2>
+        <p class="fs-5 opacity-90 mb-4 mx-auto" style="max-width: 650px;">
+            Join over 15,000+ students and educators using QuizVerse to practice, evaluate skills, and issue certified credentials.
+        </p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg px-5 py-3 rounded-4 font-monospace fw-bold text-dark shadow-lg">
+                <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Start Learning Free
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-5 py-3 rounded-4 font-monospace fw-semibold">
+                Sign In to Account
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ── iGuru RICH MULTI-COLUMN FOOTER ──────────────────────────────── -->
+<footer class="iguru-footer">
+    <div class="container">
+        <div class="row g-4 mb-5">
+            <div class="col-lg-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="brand-icon-box">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
+                    <span class="fw-bold fs-4 text-white">Quiz<span class="text-teal-custom">Verse</span></span>
+                </div>
+                <p class="text-secondary small mb-4" style="line-height: 1.65; max-width: 320px;">
+                    QuizVerse is the next-generation interactive examination and learning platform engineered for schools, universities, and tech learners.
+                </p>
+                <div class="d-flex gap-2">
+                    <a href="#" class="social-icon-btn"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="social-icon-btn"><i class="bi bi-github"></i></a>
+                    <a href="#" class="social-icon-btn"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="social-icon-btn"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <h4 class="footer-title">Top Domains</h4>
+                <ul class="footer-links">
+                    <li><a href="#categories">Web Development</a></li>
+                    <li><a href="#categories">Data Science & AI</a></li>
+                    <li><a href="#categories">Cybersecurity</a></li>
+                    <li><a href="#categories">Aptitude Tests</a></li>
+                    <li><a href="#categories">Cloud & DevOps</a></li>
+                </ul>
+            </div>
+
+            <div class="col-6 col-lg-2">
+                <h4 class="footer-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#quizzes">All Quizzes</a></li>
+                    <li><a href="#features">Key Features</a></li>
+                    <li><a href="#pricing">Pricing Plans</a></li>
+                    <li><a href="#faq">Help & FAQ</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4">
+                <h4 class="footer-title">Subscribe to Newsletter</h4>
+                <p class="text-secondary small mb-3">Get weekly quiz updates, new category additions, and study guides.</p>
+                <form onsubmit="event.preventDefault(); alert('Thank you for subscribing to QuizVerse updates!');">
+                    <div class="input-group">
+                        <input type="email" class="form-control bg-dark border-secondary text-white py-2.5 px-3" placeholder="Enter your email..." required>
+                        <button class="btn btn-teal-custom px-4" type="submit">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <hr class="border-secondary opacity-25 my-4">
+        
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between text-secondary small">
+            <div>&copy; 2026 QuizVerse — Online Quiz & Examination System. All Rights Reserved.</div>
+            <div class="d-flex gap-3 mt-2 mt-md-0">
+                <a href="#" class="text-secondary text-decoration-none hover-white">Privacy Policy</a>
+                <span>•</span>
+                <a href="#" class="text-secondary text-decoration-none hover-white">Terms of Service</a>
+                <span>•</span>
+                <a href="#" class="text-secondary text-decoration-none hover-white">API Docs</a>
+            </div>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function checkInteractiveQuiz(btn) {
+    const isCorrect = btn.getAttribute('data-correct') === 'true';
+    const allBtns = document.querySelectorAll('.live-option-btn');
+    const simBlank = document.getElementById('sim-blank');
+    const simStatus = document.getElementById('sim-status');
+    const simScore = document.getElementById('sim-score');
+    const simSpinner = document.getElementById('sim-spinner');
+
+    allBtns.forEach(b => {
+        b.classList.remove('selected-correct', 'selected-wrong');
+        b.querySelector('i').className = 'bi bi-circle';
+    });
+
+    simSpinner.classList.remove('d-none');
+    simStatus.innerText = 'Status: Evaluating candidate choice...';
+
+    setTimeout(() => {
+        simSpinner.classList.add('d-none');
+        if (isCorrect) {
+            btn.classList.add('selected-correct');
+            btn.querySelector('i').className = 'bi bi-check-circle-fill text-success';
+            simBlank.innerText = 'tuple';
+            simBlank.className = 'text-success fw-bold';
+            simStatus.innerText = 'Result: Correct! tuple() is immutable in Python.';
+            simScore.innerText = 'XP: +100';
+            simScore.className = 'badge badge-custom badge-student bg-success text-white px-3 py-1.5';
+        } else {
+            btn.classList.add('selected-wrong');
+            btn.querySelector('i').className = 'bi bi-x-circle-fill text-danger';
+            simBlank.innerText = 'INVALID';
+            simBlank.className = 'text-danger fw-bold';
+            simStatus.innerText = 'Result: Incorrect. Try Option C tuple().';
+            simScore.innerText = 'XP: +0';
+            simScore.className = 'badge badge-custom badge-student bg-danger text-white px-3 py-1.5';
+        }
+    }, 400);
+}
+</script>
+{% endblock %}

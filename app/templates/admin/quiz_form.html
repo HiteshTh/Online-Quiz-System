@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9 col-lg-8">
+        <div class="card glass-card p-4 p-md-5">
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-secondary-custom me-3">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+                <h2 class="mb-0 text-white font-heading">{{ title }}</h2>
+            </div>
+            
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    <label for="title" class="form-label form-label-custom">Quiz Title</label>
+                    {{ form.title(class="form-control form-control-custom", placeholder="e.g. Advanced Python Programming", id="title") }}
+                    {% if form.title.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.title.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label form-label-custom">Description (Instructions)</label>
+                    {{ form.description(class="form-control form-control-custom", rows="3", placeholder="Explain the quiz scope, rules, and expectations...", id="description") }}
+                    {% if form.description.errors %}
+                        <div class="text-danger small mt-1">
+                            {% for error in form.description.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="category_name" class="form-label form-label-custom">Category / Topic</label>
+                        {{ form.category_name(class="form-control form-control-custom", placeholder="e.g. Python, SQL, Networking", id="category_name") }}
+                        {% if form.category_name.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.category_name.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="duration_minutes" class="form-label form-label-custom">Duration (Minutes)</label>
+                        {{ form.duration_minutes(class="form-control form-control-custom", id="duration_minutes") }}
+                        {% if form.duration_minutes.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.duration_minutes.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="pass_percentage" class="form-label form-label-custom">Passing Percentage (%)</label>
+                        {{ form.pass_percentage(class="form-control form-control-custom", id="pass_percentage") }}
+                        {% if form.pass_percentage.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.pass_percentage.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="negative_mark_value" class="form-label form-label-custom">Negative Mark Penalty</label>
+                        {{ form.negative_mark_value(class="form-control form-control-custom", step="0.05", id="negative_mark_value") }}
+                        {% if form.negative_mark_value.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.negative_mark_value.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row my-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check form-switch">
+                            {{ form.shuffle_questions(class="form-check-input", type="checkbox", id="shuffle_questions") }}
+                            <label class="form-check-label text-white" for="shuffle_questions">Shuffle Questions Order</label>
+                        </div>
+                        <div class="text-secondary small">Randomize question delivery sequence per attempt.</div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check form-switch">
+                            {{ form.negative_marking(class="form-check-input", type="checkbox", id="negative_marking") }}
+                            <label class="form-check-label text-white" for="negative_marking">Enable Negative Marking</label>
+                        </div>
+                        <div class="text-secondary small">Subtract penalty marks for wrong selections.</div>
+                    </div>
+                </div>
+
+                <hr class="border-secondary border-opacity-30 my-4">
+
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        {{ form.is_published(class="form-check-input", type="checkbox", id="is_published") }}
+                        <label class="form-check-label text-white" for="is_published">Publish Quiz (Make available for Students)</label>
+                    </div>
+                    <div class="text-secondary small">If disabled, the quiz remains saved as a draft.</div>
+                </div>
+
+                <div class="d-grid mt-4">
+                    {{ form.submit(class="btn btn-teal-custom py-2") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

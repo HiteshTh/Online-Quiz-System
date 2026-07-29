@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+
+{% block title %}Taking Quiz - {{ attempt.quiz.title }}{% endblock %}
+
+{% block extra_head %}
+<!-- Socket.IO Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+<style>
+    /* Wizard navigation buttons */
+    .quiz-nav-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1.5px solid var(--border-color);
+        color: var(--text-primary);
+        font-family: var(--font-heading);
+        font-weight: 600;
+        border-radius: 16px;
+        padding: 12px 28px;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+    }
+    .quiz-nav-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+    .quiz-nav-btn.primary {
+        background: var(--accent-purple);
+        border-color: var(--accent-purple);
+        color: white;
+        box-shadow: 0 4px 14px var(--accent-purple-glow);
+    }
+    .quiz-nav-btn.primary:hover {
+        background: hsl(249, 70%, 55%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px var(--accent-purple-glow);
+    }
+    .quiz-nav-btn.submit-btn {
+        background: linear-gradient(135deg, var(--accent-success) 0%, #15803d 100%);
+        border-color: var(--accent-success);
+        color: white;
+        box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+    }
+    .quiz-nav-btn.submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(34, 197, 94, 0.5);
+    }
+    
+    /* Question panel transitions */
+    .question-panel {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+    .question-panel.active {
+        display: block;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Question number dots */
+    .q-dot-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .q-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        border: 1.5px solid var(--border-color);
+        background: rgba(255,255,255,0.04);
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+    }
+    .q-dot.answered {
+        background: rgba(106, 90, 224, 0.2);
+        border-color: var(--accent-purple);
+        color: white;
+    }
+    .q-dot.current {
+        background: var(--accent-purple);
+        border-color: var(--accent-purple);
+        color: white;
+        box-shadow: 0 0 12px var(--accent-purple-glow);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page-level data attributes: Jinja2 values stored here, read by JS below -->
+<div id="page-data"
+     data-attempt-id="{{ attempt.id }}"
+     data-quiz-id="{{ attempt.quiz.id }}"
+     data-total-questions="{{ questions|length }}"
+     data-seconds-left="{{ seconds_left }}"
+     style="display:none;"
+></div>
+
+<!-- Pro Security Guard Header Bar -->
+<div class="card glass-card p-3 mb-4 border border-secondary border-opacity-20 d-flex flex-row align-items-center justify-content-between flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-info bg-opacity-20 text-info border border-info border-opacity-30 px-3 py-1.5 rounded-pill font-monospace fw-bold">
+            <i class="bi bi-shield-check me-1"></i> SAFE EXAM GUARD ACTIVE
+        </span>
+        <span id="fullscreen-status-badge" class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30">
+            <i class="bi bi-arrows-fullscreen me-1"></i> Fullscreen Locked
+        </span>
+    </div>
+    <div class="d-flex align-items-center gap-3 text-secondary small">
+        <span><i class="bi bi-shield-lock-fill text-warning me-1"></i> Copy/DevTools: <strong class="text-white">Locked 🔒</strong></span>
+        <span class="opacity-25">|</span>
+        <span>Security Violations: <strong id="security-violation-count" class="badge bg-secondary text-white ms-1">0 / 3</strong></span>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Quiz Engine Wizard Column -->
+    <div class="col-lg-8">
+        <div class="card glass-card p-4 p-md-5">
+            <!-- Quiz Title Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-15">
+                <div>
+                    <span class="badge badge-custom badge-student mb-1">{{ attempt.quiz.category.name }}</span>
+                    <h4 class="text-white font-heading fw-bold mb-0">{{ attempt.quiz.title }}</h4>
+                </div>
+                <span class="text-secondary small"><i class="bi bi-list-ol me-1"></i>{{ questions|length }} Questions</span>
+            </div>
+            
+            <!-- Wizard Progress Bar -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-secondary small fw-semibold" id="question-counter">QUESTION 1 OF {{ questions|length }}</span>
+                    <span class="text-secondary small" id="answered-counter">0 answered</span>
+                </div>
+                <div class="wizard-progress-bar">
+                    <div class="wizard-progress-fill" id="progress-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Form wrapping all questions -->
+            <form id="quiz-form" method="POST" action="{{ url_for('student.submit_quiz', attempt_id=attempt.id) }}">
+                {% for q in questions %}
+                    <div class="question-panel {% if loop.index == 1 %}active{% endif %}" id="q-panel-{{ loop.index }}" data-index="{{ loop.index }}">
+                        <h5 class="text-white font-heading fw-semibold mb-4">
+                            <span class="text-secondary" style="color: var(--accent-purple);">Q{{ loop.index }}. </span>{{ q.question_text }}
+                            <span class="badge bg-secondary bg-opacity-20 text-secondary ms-2 small fw-normal">{{ q.marks }} mark(s)</span>
+                        </h5>
+                        
+                        <!-- MCQ / True-False Options -->
+                        {% if q.question_type in ['mcq', 'true_false'] %}
+                            <div class="d-flex flex-column gap-3 mt-3">
+                                {% for opt in q.options %}
+                                    <label class="play-option-label" id="label-{{ q.id }}-{{ opt.id }}">
+                                        <input
+                                            type="radio"
+                                            name="question_{{ q.id }}"
+                                            value="{{ opt.id }}"
+                                            class="play-option-input"
+                                            data-q-index="{{ loop.index0 }}"
+                                            data-q-id="{{ q.id }}"
+                                        >
+                                        <span>{{ opt.option_text }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        {% elif q.question_type == 'fill_blank' %}
+                            <div class="mt-3">
+                                <input
+                                    type="text"
+                                    name="question_{{ q.id }}"
+                                    class="form-control form-control-custom py-2 rounded-3 fill-blank-input"
+                                    placeholder="Type your answer here (case-insensitive)..."
+                                    autocomplete="off"
+                                    data-q-index="{{ loop.index0 }}"
+                                    data-q-id="{{ q.id }}"
+                                >
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Navigation Buttons -->
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top border-secondary border-opacity-10">
+                            {% if loop.index > 1 %}
+                                <button type="button" class="quiz-nav-btn btn-prev" data-target="{{ loop.index - 1 }}">
+                                    <i class="bi bi-arrow-left me-2"></i>Previous
+                                </button>
+                            {% else %}
+                                <span></span>
+                            {% endif %}
+                            
+                            {% if loop.index < questions|length %}
+                                <button type="button" class="quiz-nav-btn primary btn-next" data-target="{{ loop.index + 1 }}">
+                                    Next<i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            {% else %}
+                                <!-- Final question: show Submit button -->
+                                <button type="button" class="quiz-nav-btn submit-btn" onclick="submitExamWithConfirmation()">
+                                    <i class="bi bi-send-fill me-2"></i>Finish & Submit
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </form>
+        </div>
+    </div>
+    
+    <!-- Sidebar Column: Timer + Navigation Dots -->
+    <div class="col-lg-4">
+        <div class="sidebar-timer">
+            
+            <!-- Countdown Timer -->
+            <div class="card glass-card p-4 text-center mb-4 timer-glow border border-secondary border-opacity-15" id="timer-box">
+                <h6 class="text-secondary text-uppercase mb-2" style="letter-spacing: 0.08em; font-size: 0.78rem;">Time Remaining</h6>
+                <div class="display-4 font-heading text-white fw-bold mb-1" id="countdown-clock">00:00</div>
+                <small class="text-secondary" id="timer-status">Timer running</small>
+            </div>
+            
+            <!-- Question Navigation Dots -->
+            <div class="card glass-card p-4 mb-4">
+                <h6 class="text-secondary mb-3" style="font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;">Questions</h6>
+                <div class="q-dot-row" id="q-dot-row">
+                    {% for q in questions %}
+                        <div class="q-dot {% if loop.index == 1 %}current{% endif %}" id="q-dot-{{ loop.index }}" data-target="{{ loop.index }}">{{ loop.index }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Live Room Activity -->
+            <div class="card glass-card p-4 mb-4">
+                <h6 class="text-secondary mb-2" style="font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;"><i class="bi bi-people-fill me-2" style="color: var(--accent-teal);"></i>Live Room</h6>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span class="text-secondary small">Currently active:</span>
+                    <span class="badge badge-custom badge-student" id="live-taker-counter">1</span>
+                </div>
+            </div>
+            
+            <!-- Quick Submit (Desktop) -->
+            <div class="card glass-card p-4 d-none d-lg-block">
+                <h5 class="text-white font-heading fw-bold mb-2">Ready to submit?</h5>
+                <p class="text-secondary small mb-4">Review all questions, then finish when ready. Time up = auto-submit.</p>
+                <button type="button" class="btn btn-teal-custom w-100 py-2" onclick="submitExamWithConfirmation()">
+                    <i class="bi bi-send-fill me-2"></i>Finish &amp; Submit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Anti-cheat JS loading -->
+<script src="{{ url_for('static', filename='js/anti_cheat.js') }}"></script>
+<script>
+    // Read all Jinja2-rendered values from DOM data attributes (no template expressions in JS)
+    const pageData = document.getElementById('page-data');
+    const totalQuestions = parseInt(pageData.dataset.totalQuestions, 10);
+    let secondsLeft = parseInt(pageData.dataset.secondsLeft, 10);
+
+    // ─────────────────────────────────────────────
+    // 1. Wizard State Management
+    // ─────────────────────────────────────────────
+    let currentQuestion = 1;
+    const answeredSet = new Set();
+
+    function updateUI() {
+        // Update progress counter text
+        document.getElementById('question-counter').textContent = 'QUESTION ' + currentQuestion + ' OF ' + totalQuestions;
+        document.getElementById('answered-counter').textContent = answeredSet.size + ' answered';
+
+        // Update progress bar width
+        const pct = (currentQuestion / totalQuestions) * 100;
+        document.getElementById('progress-fill').style.width = pct + '%';
+
+        // Update active panel
+        document.querySelectorAll('.question-panel').forEach(function(el) { el.classList.remove('active'); });
+        document.getElementById('q-panel-' + currentQuestion).classList.add('active');
+
+        // Update dots
+        document.querySelectorAll('.q-dot').forEach(function(dot, idx) {
+            dot.classList.remove('current');
+            var dotNum = idx + 1;
+            if (dotNum === currentQuestion) dot.classList.add('current');
+            if (answeredSet.has(dotNum)) dot.classList.add('answered');
+            else dot.classList.remove('answered');
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToQuestion(num) {
+        if (num < 1 || num > totalQuestions) return;
+        currentQuestion = num;
+        updateUI();
+    }
+
+    function markAnswered(questionIndex, questionId) {
+        var questionNumber = questionIndex + 1;
+        answeredSet.add(questionNumber);
+        var labels = document.querySelectorAll('label[id^="label-' + questionId + '"]');
+        labels.forEach(function(lbl) { lbl.classList.remove('selected'); });
+        var radios = document.querySelectorAll('input[name="question_' + questionId + '"]');
+        radios.forEach(function(r) {
+            if (r.checked) {
+                var lbl = document.getElementById('label-' + questionId + '-' + r.value);
+                if (lbl) lbl.classList.add('selected');
+            }
+        });
+        updateUI();
+    }
+
+    // Wire up navigation buttons (prev/next) and q-dot clicks via JS (no inline handlers)
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.btn-prev, .btn-next').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                goToQuestion(parseInt(btn.dataset.target, 10));
+            });
+        });
+        document.querySelectorAll('.q-dot').forEach(function(dot) {
+            dot.addEventListener('click', function() {
+                goToQuestion(parseInt(dot.dataset.target, 10));
+            });
+        });
+        // Wire radio inputs
+        document.querySelectorAll('.play-option-input').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                markAnswered(parseInt(radio.dataset.qIndex, 10), radio.dataset.qId);
+            });
+        });
+        // Wire fill-in-blank inputs
+        document.querySelectorAll('.fill-blank-input').forEach(function(input) {
+            input.addEventListener('input', function() {
+                markAnswered(parseInt(input.dataset.qIndex, 10), input.dataset.qId);
+            });
+        });
+        // Initialize progress bar on load
+        updateUI();
+    });
+
+    // ─────────────────────────────────────────────
+    // 2. Timer Logic
+    // ─────────────────────────────────────────────
+    const clockEl = document.getElementById('countdown-clock');
+    const timerBox = document.getElementById('timer-box');
+    const timerStatus = document.getElementById('timer-status');
+
+    function formatTime(sec) {
+        const mins = Math.floor(sec / 60);
+        const secs = sec % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    clockEl.innerText = formatTime(secondsLeft);
+
+    const interval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft <= 60) {
+            timerBox.style.borderColor = 'var(--accent-danger)';
+            clockEl.style.color = 'var(--accent-danger)';
+            timerStatus.innerText = '⚡ Under 1 minute left!';
+        }
+        if (secondsLeft <= 0) {
+            clearInterval(interval);
+            clockEl.innerText = '00:00';
+            timerStatus.innerText = 'Time up!';
+            autoSubmitExam();
+        } else {
+            clockEl.innerText = formatTime(secondsLeft);
+        }
+    }, 1000);
+
+    function autoSubmitExam() {
+        alert("Time is up! Your exam will be submitted automatically.");
+        document.getElementById('quiz-form').submit();
+    }
+
+    function submitExamWithConfirmation() {
+        if (confirm("Are you sure you want to finish and submit the quiz?")) {
+            document.getElementById('quiz-form').submit();
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // 3. Socket.IO Live Counter
+    // ─────────────────────────────────────────────
+    const socket = io();
+    const quizId = pageData.dataset.quizId;
+
+    socket.on('connect', function() {
+        socket.emit('join_quiz', { quiz_id: quizId });
+    });
+
+    socket.on('active_takers_update', function(data) {
+        document.getElementById('live-taker-counter').innerText = data.count;
+    });
+
+    window.addEventListener('beforeunload', function() {
+        socket.emit('leave_quiz', { quiz_id: quizId });
+        socket.disconnect();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard - {{ quiz.title }}{% endblock %}
+
+{% block extra_head %}
+<!-- Socket.IO Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+<style>
+    /* Tabs selector matching Figma UI */
+    .tab-selector {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 6px;
+        display: inline-flex;
+        gap: 4px;
+        width: 100%;
+        max-width: 280px;
+    }
+    .tab-selector-btn {
+        flex: 1;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 10px;
+        border-radius: 10px;
+        transition: var(--transition-smooth);
+        cursor: pointer;
+    }
+    .tab-selector-btn.active {
+        background: var(--accent-purple);
+        color: white;
+        box-shadow: 0 4px 12px var(--accent-purple-glow);
+    }
+    
+    /* List items for rankings > 3 */
+    .rank-list-item {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        padding: 16px 20px;
+        transition: var(--transition-smooth);
+    }
+    .rank-list-item:hover {
+        border-color: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+    }
+    .rank-list-item.current-user-item {
+        background: rgba(106, 90, 224, 0.08);
+        border-color: rgba(106, 90, 224, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-5 align-items-center g-4">
+    <div class="col-md-8">
+        <a href="{{ url_for('student.dashboard') }}" class="btn btn-sm btn-secondary-custom mb-3 px-3">
+            <i class="bi bi-arrow-left me-1"></i>Back to Portal
+        </a>
+        <h1 class="text-white font-heading fw-bold mb-1"><i class="bi bi-trophy-fill text-warning me-2"></i>Hall of Fame</h1>
+        <p class="text-secondary mb-0">Live real-time rankings for <strong>{{ quiz.title }}</strong>.</p>
+    </div>
+    
+    <!-- Tab Selector -->
+    <div class="col-md-4 text-md-end text-start">
+        <div class="tab-selector">
+            <button type="button" class="tab-selector-btn" onclick="this.classList.toggle('active'); document.getElementById('btn-alltime').classList.toggle('active')">Weekly</button>
+            <button type="button" class="tab-selector-btn active" id="btn-alltime">All Time</button>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        
+        <!-- TOP 3 PODIUM DISPLAY -->
+        {% if leaderboards %}
+            <div class="podium-container d-flex justify-content-center align-items-end gap-md-5 gap-3">
+                
+                <!-- 2nd Place (Left) -->
+                {% if leaderboards|length >= 2 %}
+                {% set second = leaderboards[1] %}
+                <div class="podium-item text-center">
+                    <div class="podium-avatar mb-3">
+                        <div class="position-relative d-inline-block">
+                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={{ second.user.name }}" alt="" class="rounded-circle border border-2 border-secondary" width="70" height="70">
+                            <span class="podium-badge badge-second">2</span>
+                        </div>
+                    </div>
+                    <div class="podium-name text-white fw-bold text-truncate" style="max-width: 100px;">{{ second.user.name }}</div>
+                    <div class="podium-score small text-secondary fw-semibold mb-3">{{ second.score|int }} pts</div>
+                    <div class="podium-bar podium-bar-second d-flex align-items-center justify-content-center text-secondary fw-bold fs-5">2</div>
+                </div>
+                {% endif %}
+
+                <!-- 1st Place (Center) -->
+                {% if leaderboards|length >= 1 %}
+                {% set first = leaderboards[0] %}
+                <div class="podium-item text-center">
+                    <div class="podium-avatar mb-3">
+                        <div class="position-relative d-inline-block">
+                            <span class="podium-crown"><i class="bi bi-crown-fill text-warning fs-3"></i></span>
+                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={{ first.user.name }}" alt="" class="rounded-circle border border-2 border-warning" width="90" height="90">
+                            <span class="podium-badge badge-first">1</span>
+                        </div>
+                    </div>
+                    <div class="podium-name text-white fw-bold text-truncate" style="max-width: 120px;">{{ first.user.name }}</div>
+                    <div class="podium-score small text-warning fw-semibold mb-3">{{ first.score|int }} pts</div>
+                    <div class="podium-bar podium-bar-first d-flex align-items-center justify-content-center text-warning fw-bold fs-4">1</div>
+                </div>
+                {% endif %}
+
+                <!-- 3rd Place (Right) -->
+                {% if leaderboards|length >= 3 %}
+                {% set third = leaderboards[2] %}
+                <div class="podium-item text-center">
+                    <div class="podium-avatar mb-3">
+                        <div class="position-relative d-inline-block">
+                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={{ third.user.name }}" alt="" class="rounded-circle border border-2 border-danger" width="60" height="60">
+                            <span class="podium-badge badge-third">3</span>
+                        </div>
+                    </div>
+                    <div class="podium-name text-white fw-bold text-truncate" style="max-width: 100px;">{{ third.user.name }}</div>
+                    <div class="podium-score small text-secondary fw-semibold mb-3">{{ third.score|int }} pts</div>
+                    <div class="podium-bar podium-bar-third d-flex align-items-center justify-content-center text-secondary fw-bold fs-6">3</div>
+                </div>
+                {% endif %}
+
+            </div>
+        {% endif %}
+        
+        <!-- REST OF THE LEADERBOARD RANKS LIST -->
+        <div class="d-flex flex-column gap-3">
+            {% for att in leaderboards %}
+                {% if loop.index > 3 or (loop.index <= 3 and leaderboards|length <= 3 and loop.index == loop.length) %}
+                    <!-- Render rank items dynamically -->
+                {% endif %}
+                
+                <!-- Display row for items ranked 4 or lower -->
+                {% if loop.index > 3 %}
+                    <div class="rank-list-item d-flex align-items-center justify-content-between {% if att.user_id == current_user.id %}current-user-item{% endif %}">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="leaderboard-rank rank-other fw-bold font-heading small">
+                                {{ loop.index }}
+                            </div>
+                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed={{ att.user.name }}" alt="" class="rounded-circle border border-1 border-secondary border-opacity-30" width="40" height="40" style="background: var(--bg-surface);">
+                            <div>
+                                <span class="text-white fw-bold d-block">{{ att.user.name }}</span>
+                                {% if att.user_id == current_user.id %}
+                                    <span class="badge bg-teal bg-opacity-20 text-teal py-0 small" style="font-size: 0.65rem; color: var(--accent-teal);">You</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="text-end">
+                            <span class="text-white fw-bold d-block font-heading">{{ att.score|int }} pts</span>
+                            <span class="text-secondary small d-block" style="font-size: 0.72rem;">{{ att.percentage }}%</span>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="card glass-card text-center p-5">
+                    <i class="bi bi-person-exclamation display-4 mb-3 text-secondary"></i>
+                    <h5 class="text-white font-heading">No Attempts Logged Yet</h5>
+                    <p class="text-secondary small mb-0">Be the first to attempt the quiz and claim 1st place on the podium!</p>
+                </div>
+            {% endfor %}
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Connect to Socket.IO namespace for live leaderboard refreshes
+    const socket = io();
+    const quizId = "{{ quiz.id }}";
+    
+    socket.on('connect', () => {
+        socket.emit('join_leaderboard', { quiz_id: quizId });
+    });
+    
+    // Auto-reload the page when server signals a leaderboard refresh
+    socket.on('leaderboard_refresh', () => {
+        const banner = document.createElement("div");
+        banner.className = "alert alert-success fixed-bottom mx-auto my-3 text-center timer-glow";
+        banner.style.maxWidth = "400px";
+        banner.style.zIndex = "9999";
+        banner.innerHTML = `
+            <div class="d-flex align-items-center justify-content-center">
+                <i class="bi bi-arrow-repeat spin-icon me-2 fs-5"></i>
+                <strong>Leaderboard updated! Refreshing live rankings...</strong>
+            </div>
+        `;
+        document.body.appendChild(banner);
+        
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    });
+</script>
+<style>
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .spin-icon {
+        animation: spin 1s linear infinite;
+    }
+</style>
+{% endblock %}
