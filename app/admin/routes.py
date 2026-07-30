@@ -303,3 +303,66 @@ def import_questions(quiz_id):
         flash(f"Error parsing CSV file. Please match template layout. Error: {str(e)}", "danger")
         
     return redirect(url_for('admin.manage_questions', quiz_id=quiz.id))
+
+
+@admin_bp.route('/students')
+def students():
+    filter_type = request.args.get('filter', 'all')  # all, taken, not_taken
+    search_query = request.args.get('q', '').strip()
+    
+    # Base query for all student users
+    query = User.query.filter_by(role='student')
+    
+    if search_query:
+        search_filter = f"%{search_query}%"
+        query = query.filter(db.or_(User.name.ilike(search_filter), User.email.ilike(search_filter)))
+        
+    students_raw = query.order_by(User.created_at.desc()).all()
+    
+    student_list = []
+    total_registered = len(students_raw)
+    total_taken = 0
+    total_not_taken = 0
+    
+    for student in students_raw:
+        # Fetch attempts for this student
+        attempts = Attempt.query.filter_by(user_id=student.id).order_by(Attempt.started_at.desc()).all()
+        submitted_attempts = [att for att in attempts if att.status != 'in_progress']
+        
+        has_taken_test = len(submitted_attempts) > 0
+        if has_taken_test:
+            total_taken += 1
+        else:
+            total_not_taken += 1
+            
+        # Apply status filter
+        if filter_type == 'taken' and not has_taken_test:
+            continue
+        if filter_type == 'not_taken' and has_taken_test:
+            continue
+            
+        # Compute metrics
+        highest_score = max([att.percentage for att in submitted_attempts], default=0.0) if submitted_attempts else 0.0
+        avg_score = round(sum(att.percentage for att in submitted_attempts) / len(submitted_attempts), 1) if submitted_attempts else 0.0
+        passed_count = sum(1 for att in submitted_attempts if att.is_passed)
+        
+        student_list.append({
+            'user': student,
+            'has_taken_test': has_taken_test,
+            'attempts_count': len(submitted_attempts),
+            'passed_count': passed_count,
+            'highest_score': highest_score,
+            'avg_score': avg_score,
+            'attempts': submitted_attempts
+        })
+        
+    return render_template(
+        'admin/students.html',
+        students=student_list,
+        total_registered=total_registered,
+        total_taken=total_taken,
+        total_not_taken=total_not_taken,
+        current_filter=filter_type,
+        search_query=search_query
+    )
+

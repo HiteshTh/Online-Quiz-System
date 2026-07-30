@@ -12,38 +12,49 @@
     <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
             <h1 class="mb-1 text-teal" style="color: var(--accent-teal);">Control Console</h1>
-            <p class="text-secondary mb-0">Monitor examinations, review analytics, and manage question databases</p>
+            <p class="text-secondary mb-0">Monitor examinations, review analytics, and manage student rosters</p>
         </div>
-        <a href="{{ url_for('admin.create_quiz') }}" class="btn btn-teal-custom">
-            <i class="bi bi-plus-circle-fill me-2"></i>Create New Quiz
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ url_for('admin.students') }}" class="btn btn-secondary-custom">
+                <i class="bi bi-people-fill me-2"></i>Student Roster & Analytics
+            </a>
+            <a href="{{ url_for('admin.create_quiz') }}" class="btn btn-teal-custom">
+                <i class="bi bi-plus-circle-fill me-2"></i>Create New Quiz
+            </a>
+        </div>
     </div>
 </div>
 
 <!-- Stats Counter Rows -->
 <div class="row g-4 mb-5">
     <div class="col-md-3">
-        <div class="card glass-card p-4 text-center">
-            <h6 class="text-secondary text-uppercase mb-2">Registered Students</h6>
-            <h2 class="display-6 font-heading mb-0" style="color: var(--accent-teal);">{{ total_students }}</h2>
+        <a href="{{ url_for('admin.students') }}" class="text-decoration-none">
+            <div class="card glass-card p-4 text-center h-100" style="transition: var(--transition-smooth); cursor: pointer;">
+                <h6 class="text-secondary text-uppercase mb-2" style="color: #cbd5e1 !important;">Registered Students</h6>
+                <h2 class="display-6 font-heading mb-1" style="color: var(--accent-teal);">{{ total_students }}</h2>
+                <small class="text-teal" style="font-size: 0.8rem;"><i class="bi bi-arrow-right-circle me-1"></i>Manage Students</small>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <div class="card glass-card p-4 text-center h-100">
+            <h6 class="text-secondary text-uppercase mb-2" style="color: #cbd5e1 !important;">Total Quizzes</h6>
+            <h2 class="display-6 font-heading mb-1" style="color: var(--accent-purple);">{{ total_quizzes }}</h2>
+            <small class="text-secondary" style="font-size: 0.8rem;">Active Question Pools</small>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card glass-card p-4 text-center">
-            <h6 class="text-secondary text-uppercase mb-2">Total Quizzes</h6>
-            <h2 class="display-6 font-heading mb-0" style="color: var(--accent-purple);">{{ total_quizzes }}</h2>
+        <div class="card glass-card p-4 text-center h-100">
+            <h6 class="text-secondary text-uppercase mb-2" style="color: #cbd5e1 !important;">Attempts Made</h6>
+            <h2 class="display-6 font-heading mb-1 text-white">{{ total_attempts }}</h2>
+            <small class="text-secondary" style="font-size: 0.8rem;">Exams Evaluated</small>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card glass-card p-4 text-center">
-            <h6 class="text-secondary text-uppercase mb-2">Attempts Made</h6>
-            <h2 class="display-6 font-heading mb-0 text-white">{{ total_attempts }}</h2>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card glass-card p-4 text-center">
-            <h6 class="text-secondary text-uppercase mb-2">Overall Pass Rate</h6>
-            <h2 class="display-6 font-heading mb-0 text-success">{{ pass_rate }}%</h2>
+        <div class="card glass-card p-4 text-center h-100">
+            <h6 class="text-secondary text-uppercase mb-2" style="color: #cbd5e1 !important;">Overall Pass Rate</h6>
+            <h2 class="display-6 font-heading mb-1 text-success">{{ pass_rate }}%</h2>
+            <small class="text-secondary" style="font-size: 0.8rem;">Candidate Pass Ratio</small>
         </div>
     </div>
 </div>
@@ -52,7 +63,7 @@
 <div class="row g-4 mb-5">
     <div class="col-lg-6">
         <div class="card glass-card p-4 h-100">
-            <h5 class="mb-4"><i class="bi bi-bar-chart-fill me-2" style="color: var(--accent-purple);"></i>Quiz Performance (Average Score %)</h5>
+            <h5 class="mb-4 text-white"><i class="bi bi-bar-chart-fill me-2" style="color: var(--accent-purple);"></i>Quiz Performance (Average Score %)</h5>
             <div style="position: relative; height: 300px;">
                 {% if quiz_labels %}
                     <canvas id="quizPerfChart"></canvas>
@@ -66,7 +77,7 @@
     </div>
     <div class="col-lg-6">
         <div class="card glass-card p-4 h-100">
-            <h5 class="mb-4"><i class="bi bi-pie-chart-fill me-2" style="color: var(--accent-teal);"></i>Overall Score Distribution</h5>
+            <h5 class="mb-4 text-white"><i class="bi bi-pie-chart-fill me-2" style="color: var(--accent-teal);"></i>Overall Score Distribution</h5>
             <div style="position: relative; height: 300px;">
                 {% if total_attempts > 0 %}
                     <canvas id="scoreDistChart"></canvas>
@@ -85,7 +96,10 @@
     <!-- Quiz list -->
     <div class="col-xl-8">
         <div class="card glass-card p-4 h-100">
-            <h5 class="mb-4"><i class="bi bi-list-task me-2" style="color: var(--accent-teal);"></i>Manage Quizzes</h5>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0 text-white"><i class="bi bi-list-task me-2" style="color: var(--accent-teal);"></i>Manage Quizzes</h5>
+                <a href="{{ url_for('admin.create_quiz') }}" class="btn btn-sm btn-teal-custom"><i class="bi bi-plus me-1"></i>New Quiz</a>
+            </div>
             <div class="table-responsive">
                 <table class="table table-custom align-middle">
                     <thead>
@@ -101,10 +115,10 @@
                     <tbody>
                         {% for quiz in quizzes %}
                             <tr>
-                                <td><strong>{{ quiz.title }}</strong></td>
+                                <td><strong class="text-white d-block" style="font-size: 1.02rem;">{{ quiz.title }}</strong></td>
                                 <td><span class="badge badge-custom badge-student">{{ quiz.category.name }}</span></td>
-                                <td>{{ quiz.duration_minutes }} mins</td>
-                                <td>{{ quiz.questions|length }}</td>
+                                <td><span class="text-white">{{ quiz.duration_minutes }} mins</span></td>
+                                <td><span class="badge bg-dark border border-secondary border-opacity-20 text-white">{{ quiz.questions|length }} Qs</span></td>
                                 <td>
                                     {% if quiz.is_published %}
                                         <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-35 badge-custom">Published</span>

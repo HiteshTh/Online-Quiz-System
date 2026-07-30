@@ -8,9 +8,9 @@
 :root {
     --bg-main: #0c092a;
     --bg-surface: #1f1d47;
-    --border-color: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.12);
     --text-primary: #ffffff;
-    --text-secondary: #908f9c;
+    --text-secondary: #cbd5e1; /* High contrast light slate */
     --accent-purple: #6a5ae0;
     --accent-purple-glow: rgba(106, 90, 224, 0.35);
     --accent-teal: #05d5ff;
@@ -39,6 +39,10 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+}
+
+.text-secondary, .text-muted {
+    color: #cbd5e1 !important;
 }
 
 .brand-icon-box {
@@ -188,21 +192,30 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--bg-main);
 }
 
-/* Custom Table styling */
+/* Custom Table styling with High Contrast Text */
 .table-custom {
-    color: var(--text-primary) !important;
+    color: #ffffff !important;
 }
 .table-custom th {
     font-family: var(--font-heading);
-    font-weight: 600;
-    color: var(--text-secondary) !important;
-    border-bottom: 2px solid var(--border-color) !important;
-    background: transparent !important;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #f1f5f9 !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.15) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    padding: 0.85rem 0.75rem;
 }
 .table-custom td {
-    border-bottom: 1px solid var(--border-color) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
     background: transparent !important;
     vertical-align: middle;
+    padding: 0.85rem 0.75rem;
+}
+.table-custom tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04) !important;
 }
 
 /* Custom badge */

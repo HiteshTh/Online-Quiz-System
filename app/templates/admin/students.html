@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}Student Roster & Assessment Analytics{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h1 class="mb-1 text-teal" style="color: var(--accent-teal);">Student Roster & Assessment Analytics</h1>
+            <p class="text-secondary mb-0">Track registered students, identify test-takers, and review individual exam history</p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary-custom">
+            <i class="bi bi-arrow-left me-1"></i>Back to Control Console
+        </a>
+    </div>
+</div>
+
+<!-- Stat Counter Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card glass-card p-4 text-center h-100">
+            <h6 class="text-secondary text-uppercase mb-2">Total Registered Students</h6>
+            <h2 class="display-6 font-heading mb-0" style="color: var(--accent-teal);">{{ total_registered }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card glass-card p-4 text-center h-100 border-success border-opacity-25">
+            <h6 class="text-secondary text-uppercase mb-2">Students Who Took Exams</h6>
+            <h2 class="display-6 font-heading mb-0 text-success">{{ total_taken }}</h2>
+            <small class="text-secondary mt-1">
+                {% if total_registered > 0 %}
+                    {{ ((total_taken / total_registered) * 100)|round(1) }}% of total users
+                {% else %}
+                    0%
+                {% endif %}
+            </small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card glass-card p-4 text-center h-100 border-warning border-opacity-25">
+            <h6 class="text-secondary text-uppercase mb-2">Has Not Taken Any Exam Yet</h6>
+            <h2 class="display-6 font-heading mb-0 text-warning">{{ total_not_taken }}</h2>
+            <small class="text-secondary mt-1">Pending assessment participation</small>
+        </div>
+    </div>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card glass-card p-4 mb-4">
+    <div class="row g-3 align-items-center">
+        <div class="col-lg-7">
+            <div class="btn-group w-100" role="group" aria-label="Student Filters">
+                <a href="{{ url_for('admin.students', filter='all', q=search_query) }}" 
+                   class="btn {% if current_filter == 'all' %}btn-teal-custom{% else %}btn-secondary-custom{% endif %} py-2">
+                    <i class="bi bi-people-fill me-1"></i>All Students ({{ total_registered }})
+                </a>
+                <a href="{{ url_for('admin.students', filter='taken', q=search_query) }}" 
+                   class="btn {% if current_filter == 'taken' %}btn-teal-custom{% else %}btn-secondary-custom{% endif %} py-2">
+                    <i class="bi bi-check-circle-fill me-1"></i>Taken Exam ({{ total_taken }})
+                </a>
+                <a href="{{ url_for('admin.students', filter='not_taken', q=search_query) }}" 
+                   class="btn {% if current_filter == 'not_taken' %}btn-teal-custom{% else %}btn-secondary-custom{% endif %} py-2">
+                    <i class="bi bi-hourglass-split me-1"></i>Not Taken Yet ({{ total_not_taken }})
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <form method="GET" action="{{ url_for('admin.students') }}" class="d-flex gap-2">
+                <input type="hidden" name="filter" value="{{ current_filter }}">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary border-opacity-25 text-secondary">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="q" class="form-control bg-dark text-white border-secondary border-opacity-25" 
+                           placeholder="Search by student name or email..." value="{{ search_query }}">
+                    {% if search_query %}
+                        <a href="{{ url_for('admin.students', filter=current_filter) }}" class="btn btn-outline-secondary d-flex align-items-center">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary-custom px-3">Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Student List Table -->
+<div class="card glass-card p-4">
+    <div class="table-responsive">
+        <table class="table table-custom align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Student Name & Info</th>
+                    <th>Email Address</th>
+                    <th>Registered Date</th>
+                    <th>Exam Participation Status</th>
+                    <th>Attempts</th>
+                    <th>Highest Score</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in students %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if s.user.avatar_url %}
+                                    <img src="{{ s.user.avatar_url }}" alt="{{ s.user.name }}" width="40" height="40" class="rounded-circle border border-secondary border-opacity-40">
+                                {% else %}
+                                    <div style="width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#6a5ae0,#05d5ff); display:flex; align-items:center; justify-content:center; font-weight:bold; color:white;">
+                                        {{ s.user.name[0]|upper }}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <strong class="text-white d-block" style="font-size:1.02rem;">{{ s.user.name }}</strong>
+                                    <small class="text-secondary">ID #{{ s.user.id }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-secondary font-monospace">{{ s.user.email }}</span>
+                        </td>
+                        <td>
+                            <span class="text-secondary">{{ s.user.created_at.strftime('%b %d, %Y') if s.user.created_at else 'N/A' }}</span>
+                        </td>
+                        <td>
+                            {% if s.has_taken_test %}
+                                <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-40 badge-custom">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Taken Exam
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-40 badge-custom">
+                                    <i class="bi bi-clock-history me-1"></i>Not Taken Yet
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-dark border border-secondary border-opacity-20 text-white px-2.5 py-1.5">
+                                {{ s.attempts_count }} attempt(s)
+                            </span>
+                        </td>
+                        <td>
+                            {% if s.has_taken_test %}
+                                <span class="fw-bold {% if s.highest_score >= 50 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ s.highest_score }}%
+                                </span>
+                            {% else %}
+                                <span class="text-secondary">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if s.has_taken_test %}
+                                <button type="button" class="btn btn-sm btn-teal-custom" data-bs-toggle="modal" data-bs-target="#historyModal{{ s.user.id }}">
+                                    <i class="bi bi-file-earmark-text me-1"></i>View Exam History
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-sm btn-secondary-custom disabled" disabled style="opacity: 0.5;">
+                                    <i class="bi bi-dash-circle me-1"></i>No History
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-secondary py-5">
+                            <i class="bi bi-person-x display-5 text-secondary d-block mb-3"></i>
+                            No students match your filter criteria.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Dialogs for Student Exam History -->
+{% for s in students %}
+    {% if s.has_taken_test %}
+        <div class="modal fade" id="historyModal{{ s.user.id }}" tabindex="-1" aria-labelledby="historyModalLabel{{ s.user.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content glass-card border border-secondary border-opacity-20 text-white" style="background: #141238;">
+                    <div class="modal-header border-bottom border-secondary border-opacity-20">
+                        <h5 class="modal-header-title text-teal mb-0" id="historyModalLabel{{ s.user.id }}">
+                            <i class="bi bi-person-badge-fill me-2"></i>Exam Attempts — {{ s.user.name }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 rounded bg-dark bg-opacity-50 text-center border border-secondary border-opacity-20">
+                                    <small class="text-secondary d-block">Total Attempts</small>
+                                    <strong class="h5 mb-0 text-white">{{ s.attempts_count }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 rounded bg-dark bg-opacity-50 text-center border border-secondary border-opacity-20">
+                                    <small class="text-secondary d-block">Passed Exams</small>
+                                    <strong class="h5 mb-0 text-success">{{ s.passed_count }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 rounded bg-dark bg-opacity-50 text-center border border-secondary border-opacity-20">
+                                    <small class="text-secondary d-block">Highest Score</small>
+                                    <strong class="h5 mb-0 text-teal">{{ s.highest_score }}%</strong>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 rounded bg-dark bg-opacity-50 text-center border border-secondary border-opacity-20">
+                                    <small class="text-secondary d-block">Average Score</small>
+                                    <strong class="h5 mb-0 text-purple" style="color: var(--accent-purple);">{{ s.avg_score }}%</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Quiz Title</th>
+                                        <th>Score</th>
+                                        <th>Percentage</th>
+                                        <th>Status</th>
+                                        <th>Tab Switches</th>
+                                        <th>Submitted At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for att in s.attempts %}
+                                        <tr>
+                                            <td>
+                                                <strong class="text-white">{{ att.quiz.title }}</strong>
+                                                <small class="text-secondary d-block">{{ att.quiz.category.name }}</small>
+                                            </td>
+                                            <td>{{ att.score }} / {{ att.total_marks }}</td>
+                                            <td>
+                                                <span class="fw-bold {% if att.is_passed %}text-success{% else %}text-danger{% endif %}">
+                                                    {{ att.percentage }}%
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if att.is_passed %}
+                                                    <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30 badge-custom">Passed</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-30 badge-custom">Failed</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if att.tab_switch_count > 0 %}
+                                                    <span class="badge bg-danger bg-opacity-20 text-danger border border-danger border-opacity-30">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i>{{ att.tab_switch_count }} violation(s)
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-30">Clean</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <small class="text-secondary">
+                                                    {{ att.submitted_at.strftime('%b %d, %Y %I:%M %p') if att.submitted_at else 'In Progress' }}
+                                                </small>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top border-secondary border-opacity-20">
+                        <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+{% endblock %}
