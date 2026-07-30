@@ -100,5 +100,7 @@ with app.app_context():
         print("Database seeding completed successfully!")
 
 if __name__ == '__main__':
-    # Run the Flask-SocketIO server on localhost port 5000
-    socketio.run(app, host='127.0.0.1', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    port = int(os.environ.get('PORT', 5000))
+    host = os.environ.get('HOST', '0.0.0.0')
+    debug = os.environ.get('FLASK_ENV', 'development') == 'development'
+    socketio.run(app, host=host, port=port, debug=debug, allow_unsafe_werkzeug=True)
