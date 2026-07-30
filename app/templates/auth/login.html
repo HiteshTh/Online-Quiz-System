@@ -28,11 +28,11 @@
             --panel: #111827;
             --card: #161d2e;
             --input-bg: #1c2438;
-            --border: rgba(255, 255, 255, 0.07);
+            --border: rgba(255, 255, 255, 0.08);
             --border-focus: #4f8ef7;
             --text: #f1f5f9;
-            --muted: #64748b;
-            --placeholder: #334155;
+            --muted: #94a3b8;
+            --placeholder: #475569;
             --blue: #3b82f6;
             --blue-dark: #2563eb;
             --blue-glow: rgba(59, 130, 246, 0.25);
@@ -50,73 +50,78 @@
             --font-ui: 'Inter', system-ui, sans-serif;
             --font-heading: 'Outfit', system-ui, sans-serif;
             --radius: 10px;
-            --radius-lg: 16px;
+            --radius-lg: 20px;
         }
 
-        html {
-            height: 100%;
+        html, body {
+            min-height: 100vh;
         }
 
         body {
             font-family: var(--font-ui);
             background-color: var(--bg);
             color: var(--text);
-            min-height: 100%;
             display: flex;
-            /* Allow page to scroll when viewport is small */
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+            position: relative;
             overflow-x: hidden;
-            overflow-y: auto;
         }
 
-        /* ── Subtle animated grid background ─────────────────── */
+        /* ── Subtle ambient glows in background ─────────────────── */
         body::before {
+            content: '';
+            position: fixed;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(20, 184, 166, 0.1) 40%, transparent 70%);
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Grid background pattern ─────────────────────────── */
+        body::after {
             content: '';
             position: fixed;
             inset: 0;
             background-image:
-                linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
             background-size: 48px 48px;
             pointer-events: none;
             z-index: 0;
         }
 
-        /* ── Page wrapper ─────────────────────────────────────── */
-        .page {
+        /* ── Centered Card ────────────────────────────────────── */
+        .auth-container {
             position: relative;
             z-index: 1;
-            display: grid;
-            grid-template-columns: 480px 1fr;
             width: 100%;
-            min-height: 100vh;
+            max-width: 440px;
         }
 
-        /* ── Left panel (form) ───────────────────────────────── */
-        .panel-form {
+        .auth-card {
             background: var(--panel);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 40px 48px;
-            min-height: 100vh;
-            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 40px 36px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
-        /* Thin custom scrollbar */
-        .panel-form::-webkit-scrollbar {
-            width: 4px;
+        /* ── Logo ────────────────────────────────────────────── */
+        .logo-wrap {
+            text-align: center;
+            margin-bottom: 28px;
         }
 
-        .panel-form::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .panel-form::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 4px;
-        }
-
-        /* ── Logo / header ───────────────────────────────────── */
         .logo {
             display: inline-flex;
             align-items: center;
@@ -124,47 +129,40 @@
             text-decoration: none;
             font-family: var(--font-heading);
             font-weight: 800;
-            font-size: 1.35rem;
+            font-size: 1.6rem;
             background: linear-gradient(135deg, var(--purple), var(--teal));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 0;
         }
 
         .logo-icon {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             background: linear-gradient(135deg, var(--purple), var(--teal));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        /* ── Card content area ───────────────────────────────── */
-        .form-body {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 32px 0;
-        }
-
+        /* ── Headings ────────────────────────────────────────── */
         .form-title {
             font-family: var(--font-heading);
-            font-size: 1.9rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: var(--text);
             line-height: 1.2;
             margin-bottom: 6px;
+            text-align: center;
         }
 
         .form-subtitle {
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             color: var(--muted);
-            margin-bottom: 28px;
+            margin-bottom: 26px;
+            text-align: center;
         }
 
-        /* ── Flash alerts ────────────────────────────────────── */
+        /* ── Flash messages ──────────────────────────────────── */
         .flash {
             border-radius: var(--radius);
             padding: 12px 14px;
@@ -200,7 +198,7 @@
             color: #fbbf24;
         }
 
-        /* ── Form elements ───────────────────────────────────── */
+        /* ── Form inputs ─────────────────────────────────────── */
         .field {
             margin-bottom: 18px;
         }
@@ -326,7 +324,7 @@
             user-select: none;
         }
 
-        /* ── Primary button ──────────────────────────────────── */
+        /* ── Buttons ─────────────────────────────────────────── */
         .btn-primary-login {
             width: 100%;
             background: var(--blue);
@@ -373,7 +371,7 @@
             white-space: nowrap;
         }
 
-        /* ── Google button ───────────────────────────────────── */
+        /* ── Google Button ───────────────────────────────────── */
         .btn-google {
             width: 100%;
             background: rgba(255, 255, 255, 0.04);
@@ -400,124 +398,44 @@
             transform: translateY(-1px);
         }
 
-        /* ── Footer note ─────────────────────────────────────── */
+        /* ── Footer Link ─────────────────────────────────────── */
+        .signup-prompt {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.88rem;
+            color: var(--muted);
+        }
+
+        .signup-prompt a {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .signup-prompt a:hover {
+            color: var(--blue-dark);
+            text-decoration: underline;
+        }
+
         .panel-footer {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--muted);
             text-align: center;
+            margin-top: 24px;
         }
 
         .panel-footer a {
-            color: var(--blue);
+            color: var(--muted);
             text-decoration: none;
         }
 
         .panel-footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* ── Right visual panel ──────────────────────────────── */
-        .panel-visual {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .panel-visual .bg-img {
-            position: absolute;
-            inset: 0;
-            background-image: url("{{ url_for('static', filename='img/cyborg_brain_login.png') }}");
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center right;
-            background-color: #0b0e18;
-        }
-
-        /* Left-to-right gradient fade — starts solid to seal the seam */
-        .panel-visual .bg-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to right,
-                    #111827 0%,
-                    #111827 2%,
-                    rgba(17, 24, 39, 0.7) 15%,
-                    rgba(17, 24, 39, 0.1) 45%,
-                    transparent 100%);
-        }
-
-        /* Floating badge inside visual panel */
-        .visual-badge {
-            position: absolute;
-            bottom: 44px;
-            right: 44px;
-            background: rgba(17, 24, 39, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 18px 22px;
-            max-width: 280px;
-        }
-
-        .visual-badge-title {
-            font-family: var(--font-heading);
-            font-weight: 700;
-            font-size: 1rem;
             color: var(--text);
-            margin-bottom: 4px;
         }
 
-        .visual-badge-sub {
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-bottom: 14px;
-        }
-
-        .visual-stats {
-            display: flex;
-            gap: 18px;
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .stat-value {
-            font-family: var(--font-heading);
-            font-weight: 700;
-            font-size: 1.25rem;
-            background: linear-gradient(135deg, var(--purple), var(--teal));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--muted);
-        }
-
-        /* ── Mobile responsive ───────────────────────────────── */
-        @media (max-width: 960px) {
-            .page {
-                grid-template-columns: 1fr;
-            }
-
-            .panel-visual {
-                display: none;
-            }
-
-            .panel-form {
-                border-right: none;
-                background: radial-gradient(ellipse at top right, rgba(139, 92, 246, 0.08), transparent 50%),
-                    radial-gradient(ellipse at bottom left, rgba(20, 184, 166, 0.07), transparent 50%),
-                    var(--panel);
-            }
-        }
-
-        @media (max-width: 520px) {
-            .panel-form {
+        @media (max-width: 480px) {
+            .auth-card {
                 padding: 32px 24px;
             }
         }
@@ -526,119 +444,114 @@
 
 <body>
 
-    <div class="page">
-
-        <!-- ── LEFT: Form panel ─────────────────────────────────── -->
-        <aside class="panel-form">
+    <div class="auth-container">
+        <div class="auth-card">
 
             <!-- Logo -->
-            <a href="/" class="logo">
-                <i class="bi bi-rocket-takeoff-fill logo-icon"></i>
-                QuizVerse
-            </a>
-
-            <!-- Form content -->
-            <div class="form-body">
-
-                <!-- Flash messages -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                {% for category, message in messages %}
-                <div class="flash {{ category }}" role="alert">
-                    {% if category == 'danger' %}
-                    <i class="bi bi-exclamation-circle-fill" style="flex-shrink:0;margin-top:1px;"></i>
-                    {% elif category == 'success' %}
-                    <i class="bi bi-check-circle-fill" style="flex-shrink:0;margin-top:1px;"></i>
-                    {% elif category == 'info' %}
-                    <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px;"></i>
-                    {% else %}
-                    <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;"></i>
-                    {% endif %}
-                    <span>{{ message }}</span>
-                </div>
-                {% endfor %}
-                {% endif %}
-                {% endwith %}
-
-                <h1 class="form-title">Welcome back 👋</h1>
-                <p class="form-subtitle">Sign in to your QuizVerse account to continue.</p>
-
-                <form method="POST" action="" novalidate>
-                    {{ form.hidden_tag() }}
-
-                    <!-- Email -->
-                    <div class="field">
-                        <div class="field-label">
-                            <span>Your Email</span>
-                        </div>
-                        <div class="input-wrap">
-                            {{ form.email(placeholder="Enter your email", id="login-email", autocomplete="email") }}
-                            <i class="bi bi-envelope input-icon" style="cursor:default;pointer-events:none;"></i>
-                        </div>
-                        {% if form.email.errors %}
-                        <div class="field-error">
-                            <i class="bi bi-exclamation-circle-fill"></i>
-                            {% for e in form.email.errors %}<span>{{ e }}</span>{% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Password -->
-                    <div class="field">
-                        <div class="field-label">
-                            <span>Your Password</span>
-                            <a href="#" onclick="return false;">Forgot Password?</a>
-                        </div>
-                        <div class="input-wrap">
-                            {{ form.password(placeholder="••••••••", id="login-password",
-                            autocomplete="current-password") }}
-                            <i class="bi bi-eye input-icon" id="pwd-toggle" title="Show / hide password"></i>
-                        </div>
-                        {% if form.password.errors %}
-                        <div class="field-error">
-                            <i class="bi bi-exclamation-circle-fill"></i>
-                            {% for e in form.password.errors %}<span>{{ e }}</span>{% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Remember me -->
-                    <div class="remember-row">
-                        <input type="checkbox" id="remember-me">
-                        <label for="remember-me">Remember Me</label>
-                    </div>
-
-                    <!-- Submit -->
-                    {{ form.submit(class="btn-primary-login", value="Log In") }}
-
-                    <!-- Divider -->
-                    <div class="divider">
-                        <hr><span>or continue with</span>
-                        <hr>
-                    </div>
-
-                    <!-- Google OAuth -->
-                    <a href="{{ url_for('auth.google_login') }}" class="btn-google">
-                        <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="#EA4335"
-                                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-                            <path fill="#4285F4"
-                                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-                            <path fill="#FBBC05"
-                                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
-                            <path fill="#34A853"
-                                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
-                        </svg>
-                        Google
-                    </a>
-
-                    <!-- Sign Up Link -->
-                    <p class="signup-prompt" style="text-align: center; margin-top: 24px; font-size: 0.9rem; color: var(--muted);">
-                        Don't have an account? <a href="{{ url_for('auth.register') }}" style="color: var(--blue); text-decoration: none; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='var(--blue-dark)'" onmouseout="this.style.color='var(--blue)'">Sign Up</a>
-                    </p>
-
-                </form>
+            <div class="logo-wrap">
+                <a href="/" class="logo">
+                    <i class="bi bi-rocket-takeoff-fill logo-icon"></i>
+                    QuizVerse
+                </a>
             </div>
+
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash {{ category }}" role="alert">
+                {% if category == 'danger' %}
+                <i class="bi bi-exclamation-circle-fill" style="flex-shrink:0;margin-top:1px;"></i>
+                {% elif category == 'success' %}
+                <i class="bi bi-check-circle-fill" style="flex-shrink:0;margin-top:1px;"></i>
+                {% elif category == 'info' %}
+                <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px;"></i>
+                {% else %}
+                <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;"></i>
+                {% endif %}
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <h1 class="form-title">Welcome back 👋</h1>
+            <p class="form-subtitle">Sign in to your QuizVerse account to continue.</p>
+
+            <form method="POST" action="" novalidate>
+                {{ form.hidden_tag() }}
+
+                <!-- Email -->
+                <div class="field">
+                    <div class="field-label">
+                        <span>Your Email</span>
+                    </div>
+                    <div class="input-wrap">
+                        {{ form.email(placeholder="Enter your email", id="login-email", autocomplete="email") }}
+                        <i class="bi bi-envelope input-icon" style="cursor:default;pointer-events:none;"></i>
+                    </div>
+                    {% if form.email.errors %}
+                    <div class="field-error">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        {% for e in form.email.errors %}<span>{{ e }}</span>{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Password -->
+                <div class="field">
+                    <div class="field-label">
+                        <span>Your Password</span>
+                        <a href="#" onclick="return false;">Forgot Password?</a>
+                    </div>
+                    <div class="input-wrap">
+                        {{ form.password(placeholder="••••••••", id="login-password", autocomplete="current-password") }}
+                        <i class="bi bi-eye input-icon" id="pwd-toggle" title="Show / hide password"></i>
+                    </div>
+                    {% if form.password.errors %}
+                    <div class="field-error">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        {% for e in form.password.errors %}<span>{{ e }}</span>{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Remember me -->
+                <div class="remember-row">
+                    <input type="checkbox" id="remember-me">
+                    <label for="remember-me">Remember Me</label>
+                </div>
+
+                <!-- Submit -->
+                {{ form.submit(class="btn-primary-login", value="Log In") }}
+
+                <!-- Divider -->
+                <div class="divider">
+                    <hr><span>or continue with</span>
+                    <hr>
+                </div>
+
+                <!-- Google OAuth -->
+                <a href="{{ url_for('auth.google_login') }}" class="btn-google">
+                    <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                        <path fill="#EA4335"
+                            d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                        <path fill="#4285F4"
+                            d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                        <path fill="#FBBC05"
+                            d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                        <path fill="#34A853"
+                            d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                    </svg>
+                    Google
+                </a>
+
+                <!-- Sign Up Link -->
+                <p class="signup-prompt">
+                    Don't have an account? <a href="{{ url_for('auth.register') }}">Sign Up</a>
+                </p>
+
+            </form>
 
             <!-- Footer -->
             <p class="panel-footer">
@@ -646,14 +559,7 @@
                 <a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a>
             </p>
 
-        </aside>
-
-        <!-- ── RIGHT: Visual panel ──────────────────────────────── -->
-        <section class="panel-visual" aria-hidden="true">
-            <div class="bg-img"></div>
-            <div class="bg-overlay"></div>
-        </section>
-
+        </div>
     </div>
 
     <script>
